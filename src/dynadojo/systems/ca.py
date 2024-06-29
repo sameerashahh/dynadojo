@@ -8,6 +8,8 @@ from joblib import Parallel, delayed
 
 from ..abstractions import AbstractSystem
 from ..utils.seeding import temp_numpy_seed, temp_random_seed
+from ..utils.ca import plot
+
 
 
 class CASystem(AbstractSystem):
@@ -106,3 +108,27 @@ class CASystem(AbstractSystem):
 
     def calc_control_cost(self, control: np.ndarray) -> float:
         return np.sum(control, axis=(1, 2))
+    
+    def save_plotted_trajectories( self, 
+            y_true:np.ndarray, 
+            y_pred: np.ndarray,
+            filepath: str,
+            tag: str = "", 
+        ):
+        """
+        Plots the trajectories of the system and the predicted trajectories.
+
+        Parameters
+        ----------
+        y : np.ndarray
+            True trajectories.
+        y_pred : np.ndarray
+            Predicted trajectories.
+        """
+        fig, ax = plot([y_true, y_pred], 
+                       target_dim=min(self._embed_dim, 3), 
+                       labels=["true", "pred"], 
+                       max_lines=10,
+                       title=f"CA l={self.latent_dim}, e={self.embed_dim} - {tag}")
+        fig.savefig(filepath, bbox_inches='tight', dpi=300, transparent=True, format='pdf')
+        return fig, ax
