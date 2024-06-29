@@ -4,9 +4,11 @@ Algorithmic Bias with Media
 import ndlib.models.ModelConfig as mc
 import ndlib.models.opinions as op
 import networkx as nx
+import numpy as np
+
 
 from ..utils.opinion import OpinionSystem
-
+from ...utils.opinion import plot
 
 class MediaBiasSystem(OpinionSystem):
 
@@ -97,3 +99,18 @@ class MediaBiasSystem(OpinionSystem):
         self.model.set_initial_status(self.config)
         self.model.status = x0
         self.model.initial_status = x0
+
+    def save_plotted_trajectories( self, 
+            y_true:np.ndarray, 
+            y_pred: np.ndarray,
+            filepath: str,
+            tag: str = "", 
+        ):
+        
+        fig, ax = plot([y_true, y_pred], 
+                       target_dim=min(self._embed_dim, 3), 
+                       labels=["true", "pred"], 
+                       max_lines=10,
+                       title=f"Opinion (M) l={self.latent_dim}, e={self._embed_dim} - {tag}")
+        fig.savefig(filepath, bbox_inches='tight', dpi=300, transparent=True, format='pdf')
+        return fig, ax
