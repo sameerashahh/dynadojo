@@ -5,6 +5,7 @@ from scipy.interpolate import interp1d
 from scipy.optimize import minimize, NonlinearConstraint
 
 from .lds import LDSystem
+from ..utils.lds import plot
 
 
 class SNNSystem(LDSystem):
@@ -59,6 +60,21 @@ class SNNSystem(LDSystem):
         data = np.array(data)
         data = np.transpose(data, axes=(0, 2, 1))
         return data
+    
+    def save_plotted_trajectories( self, 
+            y_true:np.ndarray, 
+            y_pred: np.ndarray,
+            filepath: str,
+            tag: str = "", 
+        ):
+
+        fig, ax = plot([y_true, y_pred], 
+                       target_dim=min(self._embed_dim, 3), 
+                       labels=["true", "pred"], 
+                       max_lines=10,
+                       title=f"LDS l={self.latent_dim}, e={self.embed_dim} - {tag}")
+        fig.savefig(filepath, bbox_inches='tight', dpi=300, transparent=True, format='pdf')
+        return fig, ax
 
 
 class LinearDynamicalSystem:
