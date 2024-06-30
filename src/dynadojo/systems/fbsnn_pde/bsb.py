@@ -6,6 +6,7 @@ import tensorflow as tf
 from scipy.optimize import minimize
 
 from ..utils.fbsnn import FBSNNSystem
+from ...utils.fbsnn_pde import plot
 
 """
 Adapted from Maziar Raissi, https://github.com/maziarraissi/FBSNNs
@@ -111,3 +112,17 @@ class BSBSystem(FBSNNSystem):
         return (np.exp((self.r + self.sigma_max**2)*(T - t)))*np.sum(X**2+U, 1, keepdims = True) # (N) x 1
             
 
+    def save_plotted_trajectories( self, 
+            y_true:np.ndarray, 
+            y_pred: np.ndarray,
+            filepath: str,
+            tag: str = "", 
+        ):
+
+        fig, ax = plot([y_true, y_pred], 
+		               target_dim=min(self._embed_dim, 3), 
+		               labels=["true", "pred"], 
+		               max_lines=10,
+		               title=f"FBSNN (H) l={self.latent_dim}, e={self._embed_dim} - {tag}")
+        fig.savefig(filepath, bbox_inches='tight', dpi=300, transparent=True, format='pdf')
+        return fig, ax
